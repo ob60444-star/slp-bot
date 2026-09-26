@@ -1,5 +1,5 @@
-const { Telegraf, Markup } = require('telegraf');
-const express = require('express');
+const onRequest = require("firebase-functions/v2/https").onRequest;
+const { Telegraf, Markup } = require("telegraf");
 
 const BOT_TOKEN = '8923884794:AAE4bVSm2uYSUuiaRlB-Q9kfk6RXjy9VkYw';
 const ADMIN_ID = 5888457390;
@@ -8,14 +8,12 @@ const DB_URL = 'https://slp8-bot-default-rtdb.firebaseio.com';
 
 const bot = new Telegraf(BOT_TOKEN);
 
-// دوال التواصل مع Firebase
+// دوال Firebase Database
 async function getDbData(path) {
   try {
     const res = await fetch(`${DB_URL}/${path}.json`);
     return await res.json();
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
 async function setDbData(path, data) {
@@ -155,7 +153,7 @@ bot.on('channel_post', async (ctx) => {
   }
 });
 
-// أمر إضافة مادة للأدمن
+// أمر إضافة مادة
 bot.command('add_subject', async (ctx) => {
   if (ctx.from.id !== ADMIN_ID) return;
 
@@ -172,12 +170,8 @@ bot.command('add_subject', async (ctx) => {
   ctx.reply(`✅ تم إضافة مادة (${subjectName}) للسنة ${year}`);
 });
 
-// تشغيل البوت
-bot.launch();
-console.log('Bot running...');
-
-// سيرفر ويب بسيط لإبقاء Render سعيداً في الـ Web Service
-const app = express();
-const PORT = process.env.PORT || 3000;
-app.get('/', (req, res) => res.send('Bot is active!'));
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+// تصدير دالة Firebase
+exports.bot = onRequest(async (req, res) => {
+  await bot.handleUpdate(req.body, res);
+  res.sendStatus(200);
+});
