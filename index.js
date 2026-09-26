@@ -1,4 +1,5 @@
 const { Telegraf, Markup } = require('telegraf');
+const express = require('express');
 
 const BOT_TOKEN = '8923884794:AAE4bVSm2uYSUuiaRlB-Q9kfk6RXjy9VkYw';
 const ADMIN_ID = 5888457390;
@@ -171,20 +172,12 @@ bot.command('add_subject', async (ctx) => {
   ctx.reply(`✅ تم إضافة مادة (${subjectName}) للسنة ${year}`);
 });
 
+// تشغيل البوت
 bot.launch();
 console.log('Bot running...');
-const express = require('express');
+
+// سيرفر ويب بسيط لإبقاء Render سعيداً في الـ Web Service
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 app.get('/', (req, res) => res.send('Bot is active!'));
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
-const http = require('http');
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Bot is running\n');
-});
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
